@@ -51,6 +51,7 @@ class MyClient(discord.Client):
                 player = message.author.name
                 if (player in list(self.words)):
                     if (message.content in self.words[player]):
+                        self.forgets[player] += 1
                         await message.channel.send("You already did that one!")
                     else:
                         self.words[player] += [message.content]
@@ -67,4 +68,4 @@ class MyClient(discord.Client):
   
 
 client = MyClient()
-client.run('your bot credentials key here')
+client.run("your key here")

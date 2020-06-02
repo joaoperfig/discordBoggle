@@ -3,6 +3,8 @@ import game
 import discord
 import asyncio
 import spellcheck
+import random
+import math
 from threading import Timer
 
 async def messageall(channel, client, time, message, showboard):
@@ -33,43 +35,152 @@ async def endtimer(channel, client, wait):
     sortedwords.sort()
     sortedwords.sort(key=len)
     scores = {}
+    
+    awards = {}
+    awards["3letter"] = {}
+    awards["length"] = {}
+    awards["blind"] = {}
+    awards["creative"] = {}
+    awards["unique"] = {}
+    awards["copier"] = {}
+    awards["forgetful"] = {}
+    awards["erudite"] = {}
+    awards["typer"] = {}
+    awards["loser"] = {}
+    
+    awname = {}
+    awname["3letter"] = "3 Letter King"
+    awname["length"] = "Eloquent Speaker"
+    awname["blind"] = "Board Skipper"
+    awname["creative"] = "Creative Genius"
+    awname["unique"] = "Original Writer"
+    awname["copier"] = "Derivative Bore"
+    awname["forgetful"] = "Most Forgetful"
+    awname["erudite"] = "Erudite Speaker"
+    awname["typer"] = "Typing Ninja"
+    awname["loser"] = "Greatest Loser"
+    
+    awdesc = {}
+    awdesc["3letter"] = " words with only 3 letters."
+    awdesc["length"] = " average word lenght."
+    awdesc["blind"] = " words that are not on the board."
+    awdesc["creative"] = " words that do not exist."
+    awdesc["unique"] = "% words that only you wrote."
+    awdesc["copier"] = "% words were also written by other players."
+    awdesc["forgetful"] = " times you tried to input the same word again."
+    awdesc["erudite"] = " total words."
+    awdesc["typer"] = " total key presses."   
+    awdesc["loser"] = " total points lost."  
+    
     for player in list(client.scores):
         scores[player] = 0
+        awards["3letter"][player] = 0
+        awards["length"][player] = 0
+        awards["blind"][player] = 0
+        awards["creative"][player] = 0
+        awards["unique"][player] = 0
+        awards["copier"][player] = 0
+        awards["forgetful"][player] = client.forgets[player]
+        awards["erudite"][player] = 0
+        awards["typer"][player] = 0
+        awards["loser"][player] = 0
+        
+        
     for word in sortedwords:
         points = 0
         string = "**" + word + "** - "
-        for player in words[word]:
+        wplayers = words[word]
+        for player in wplayers:
             string += player + " "
         string += "- "
-        if (len(word)> 2) and (client.game.hasword(word)):
-            if spellcheck.check(word):
-                if len(word) == 3:
-                    string += "Short word. - **1** point - "+spellcheck.priblink(word)
-                    points = 1
-                else:
-                    if len(words[word]) == 1: # only one player got it
-                        string += "Great word! - **3** points - "+spellcheck.priblink(word)
-                        points = 3                        
-                    else:
-                        string += "Good word! - **2** points - "+spellcheck.priblink(word)
-                        points = 2                               
-            else:
-                #word does not exist
-                string += "Is **not** a real word! - **0** points - "+spellcheck.priblink(word)
+        
+        length = len(word)
+        onboard = client.game.hasword(word) # exists on the board
+        exists = spellcheck.check(word) # 
+        unique = len(wplayers) == 1 # only one player got it
+        
+        if unique:
+            awards["unique"][wplayers[0]] += 1
         else:
-            if (len(word) <= 2):
-                string += "Is too short! - **0** points"
-            else:
-                string += "Is **not** on the board! - **0** points"
+            for player in wplayers:
+                awards["copier"][player] += 1            
+        
+        if (length<=2):
+            wordtype = "Too short!"
+            points = 0
+        elif not onboard:
+            for player in wplayers:
+                awards["blind"][player] += 1      
+                awards["loser"][player] += 1
+            wordtype = "**NOT** on the board!"
+            points = -1
+        elif not exists:
+            for player in wplayers:
+                awards["creative"][player] += 1      
+                awards["loser"][player]  += 1
+            wordtype = "Does **NOT** exist!"
+            points = -1
+        elif (length==3):
+            for player in wplayers:
+                awards["3letter"][player] += 1     
+            wordtype = "Okay word."
+            points = 1
+        else:
+            points = math.floor((length+1)/2)
+            if unique:
+                points += 1
+            wordtypes = ["Good word.", "Cool word.", "Great word!", "Awesome word!", "INCREDIBLE word!", "UNBELIEVABLE!!!", "YOU ARE A GOD!!!"]+[("A"*(7+(n*3)))+("!"*(3+(n*2))) for n in range(10)]
+            wordtype = wordtypes[points-2]
+        
+        for player in wplayers:
+            awards["typer"][player] += length   
+            awards["erudite"][player] += 1
+        
+        string += wordtype + " **"+str(points)+"** point"
+        if (points != 1):
+            string += "s"
+        string += " - "+spellcheck.priblink(word)
+        
+        
         for player in words[word]:
             scores[player] += points
         await channel.send(string)
-        await asyncio.sleep(2)
-    await channel.send("Those are all the words! Here are the round's scores:")
+        await asyncio.sleep(1)
+        
+    for player in list(scores):
+        awards["length"][player] = awards["typer"][player] / awards["erudite"][player]
+        awards["unique"][player] = (awards["unique"][player] / awards["erudite"][player])*100
+        awards["copier"][player] = (awards["copier"][player] / awards["erudite"][player])*100
+        
+    await channel.send("Those are all the words!")
+    await asyncio.sleep(1)
+    await channel.send("Here are the round's awards:")
+    await asyncio.sleep(2)
+    taken = []
+    for i in range(3):
+        found = False
+        award = None
+        while not found:
+            award = random.choice(list(awards))
+            if (not (award in taken)) and (max([awards[award][player] for player in list(scores)]) > 0):
+                found = True
+                taken += [award]
+        winner = None
+        record = 0
+        for player in list(scores):
+            if awards[award][player] > record:
+                winner = player
+                record = awards[award][player]
+        string = "" + awname[award] + " - **" +winner+"** - **"+str(record)+"**"+awdesc[award]
+        await channel.send(string)
+        await asyncio.sleep(4)        
+    
+    
+    await channel.send("and here are the round's scores:")
     await asyncio.sleep(4)
     string = ""
     for player in list(scores):
-        string += "     **" + player + "** -> **" + str(scores[player]) + "** points\n"
+        string += "**" + player + "** -> **" + str(scores[player]) + "** points\n"
     await channel.send(string)
     await asyncio.sleep(5)
     await channel.send("Which adds up to these session scores:")
@@ -78,7 +189,7 @@ async def endtimer(channel, client, wait):
         client.scores[player] += scores[player]
     string = ""
     for player in list(scores):
-        string += "     **" + player + "** -> **" + str(client.scores[player]) + "** points\n"    
+        string += "**" + player + "** -> **" + str(client.scores[player]) + "** points\n"    
     await channel.send(string)
     await asyncio.sleep(5)
     await channel.send("Use #game to play another game!")
@@ -161,8 +272,10 @@ class GameOperation():
         await message.channel.send("**Starting  game!**\nPlease don't type your messages on this thread.\nYou have three minutes!\nThe board is:")
         await message.channel.send(file=discord.File('img.png'))
         client.words = {}
+        client.forgets = {}
         for player in list(client.scores):
             client.words[player] = []
+            client.forgets[player] = 0
             await client.usernames[player].send("Thank you for joining this game!\nYou have three minutes!\nType one word per message underneath.\nThe board is:")
             await client.usernames[player].send(file=discord.File('img.png'))
         await messageall(message.channel, client, 60, "Two minutes remaining!", True)    

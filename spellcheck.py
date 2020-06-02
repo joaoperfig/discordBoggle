@@ -6,10 +6,14 @@ def clean(word):
     return word
 
 def browsercontent(url):
-    fp = urllib.request.urlopen(url)
-    mybytes = fp.read()
-    mystr = mybytes.decode("utf8")
-    fp.close()    
+    try:
+        fp = urllib.request.urlopen(url)
+        mybytes = fp.read()
+        mystr = mybytes.decode("utf8")
+        fp.close()    
+    except:
+        print ("ERROR: COULD NOT RECEIVE WEB DATA")
+        return "ERROR"
     return mystr
 
 def priblink(word):

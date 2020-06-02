@@ -8,7 +8,7 @@ def getrandletter():
     f.close()
     text = content.lower()
     char = random.choice(text)
-    while not (char in "abcdefghijklmnopqrstuvwxyz"+chr(231)):
+    while not (char in "abcdefghijklmnopqrstuvwxyz"):
         char = random.choice(text)
     char = char.upper()
     if (char == "Q"):
