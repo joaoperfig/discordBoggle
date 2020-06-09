@@ -2,6 +2,7 @@ import discord
 import random
 import operations
 import game
+import time
 
 def savedata(data):
     f = open("data", "w", encoding="utf8")
@@ -54,6 +55,11 @@ class MyClient(discord.Client):
                         self.forgets[player] += 1
                         await message.channel.send("You already did that one!")
                     else:
+                        thiswait = time.time() - self.lastwordtime[player]
+                        self.lastwordtime[player] = time.time()
+                        if (thiswait > self.maxwaits[player]):
+                            self.maxwaits[player] = thiswait
+                        
                         self.words[player] += [message.content]
                         print(player+" got word "+message.content)
         elif (self.state == "scoring"):
@@ -68,4 +74,4 @@ class MyClient(discord.Client):
   
 
 client = MyClient()
-client.run("your key here")
+client.run('your key here')

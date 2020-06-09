@@ -12,7 +12,7 @@ def getrandletter():
         char = random.choice(text)
     char = char.upper()
     if (char == "Q"):
-        char = "Qu"
+        char = "Q"
     return char
 
 
@@ -71,6 +71,7 @@ class BoggleGame():
     def hasword(self, word):
         word=word.upper()
         first = word[0]
+        first = first.upper()
         word = word[1:]
         for i in range(4):
             for j in range(4):
@@ -80,12 +81,13 @@ class BoggleGame():
         return False
                     
     def crawl(self, i, j, board, word):
-        if (i<0) or (i>3) or (j<0) or (j>3):
+        if (i<0) or (i>3) or (j<0) or (j>3): #arranjar isto Qu
             return False
         if (len(word) == 0):
             return True    
         board[i][j] = "?"  
         first = word[0]
+        first = first.upper()
         word = word[1:]
         for deltai in range(-1, 2):
             for deltaj in range(-1, 2):
