@@ -44,9 +44,9 @@ You cannot use the same letter twice in a single word.
 ## Scoring System
 The points system used here is as follows:
 
--One or Two letter words are worth 0 points.
--Three letter words are allways worth 1 point.
--Longer words are worth their lenght minus two. Plus one additional point if you are the only player to find them.
+- One or Two letter words are worth 0 points.
+- Three letter words are allways worth 1 point.
+- Longer words are worth their lenght minus two. Plus one additional point if you are the only player to find them.
 
 ## Changing the language
 1. Replace the contents of **corpus.txt** with text in your language. *(This is used for the letter chances in board generation)*
