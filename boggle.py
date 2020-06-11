@@ -16,6 +16,11 @@ def getdata():
     f.close()
     return eval(t)
 
+def clean(word):
+    word = word.strip()
+    word = word.lower()
+    return word
+
 
 class MyClient(discord.Client):
     def __init__(self):
@@ -51,7 +56,8 @@ class MyClient(discord.Client):
                 #dm channel
                 player = message.author.name
                 if (player in list(self.words)):
-                    if (message.content in self.words[player]):
+                    thisword = clean(message.content)
+                    if (thisword in self.words[player]):
                         self.forgets[player] += 1
                         await message.channel.send("You already did that one!")
                     else:
@@ -60,8 +66,8 @@ class MyClient(discord.Client):
                         if (thiswait > self.maxwaits[player]):
                             self.maxwaits[player] = thiswait
                         
-                        self.words[player] += [message.content]
-                        print(player+" got word "+message.content)
+                        self.words[player] += [thisword]
+                        print(player+" got word "+thisword)
         elif (self.state == "scoring"):
             None
         else:
