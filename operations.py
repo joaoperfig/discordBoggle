@@ -68,7 +68,7 @@ async def endtimer(channel, client, wait):
     
     awdesc = {}
     awdesc["3letter"] = " words with only 3 letters."
-    awdesc["length"] = " average word lenght."
+    awdesc["length"] = " average word length."
     awdesc["blind"] = " words that are not on the board."
     awdesc["creative"] = " words that do not exist."
     awdesc["unique"] = "% words that only you wrote."
@@ -134,7 +134,7 @@ async def endtimer(channel, client, wait):
             wordtype = "Okay word."
             points = 1
         else:
-            points = math.floor((length+1)/2)
+            points = length - 2 #math.floor((length+1)/2)
             if unique:
                 points += 1
             wordtypes = ["Good word.", "Cool word.", "Great word!", "Awesome word!", "INCREDIBLE word!", "UNBELIEVABLE!!!", "YOU ARE A GOD!!!"]+[("A"*(7+(n*3)))+("!"*(3+(n*2))) for n in range(10)]
