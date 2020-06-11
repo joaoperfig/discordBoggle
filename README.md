@@ -20,9 +20,12 @@ Players will DM the bot with all the words they find. Make sure to only send one
 The bot will warn of the time passage at one and two minutes. It will also DM the board image again so Players don't need to scroll up to see it.
 At three minutes the bot will warn all to go back to the channel.
 The words will be displayed one by one, along with who wrote them, points, and a link to it on the dictionary.
+
 ![Game Words](words.png)
+
 After that, the bot will award some special awards for random things and finally give the points.
 The points are then added up to the session totals.
+
 ![Game Results](results.png)
 
 ## How to Play Boggle
