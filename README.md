@@ -15,7 +15,9 @@ This is a discord bot that let's you play boggle on a server of yours! Players c
 3. Type **#game** to start a game.
 
 At this point, the bot will DM each registered player with an image of the game board, such as this one:
+
 ![Image of a Board](img_small.png)
+
 Players will DM the bot with all the words they find. Make sure to only send one word per message.
 The bot will warn of the time passage at one and two minutes. It will also DM the board image again so Players don't need to scroll up to see it.
 At three minutes the bot will warn all to go back to the channel.
