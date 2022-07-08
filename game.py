@@ -12,7 +12,7 @@ def getrandletter():
         char = random.choice(text)
     char = char.upper()
     if (char == "Q"):
-        char = "Qu"
+        char = "4"
     return char
 
 
@@ -30,6 +30,8 @@ class BoggleGame():
         for line in self.board:
             res += " "
             for char in line:
+                if char == "4":
+                    char = "Qu"                
                 res += char + " "
             res += "\n"
         return res
@@ -39,6 +41,8 @@ class BoggleGame():
         for line in self.board:
             res += "                    "
             for char in line:
+                if char == "4":
+                    char = "Qu"                
                 res += char + "         "
             res += "\n\n"
         return res    
@@ -48,6 +52,8 @@ class BoggleGame():
         for line in self.board:
             res += "               "
             for char in line:
+                if char == "4":
+                    char = "Qu"                
                 res += char + "    "
             res += "\n"
         return res        
@@ -59,6 +65,8 @@ class BoggleGame():
         for line in self.board:
             x = 100
             for char in line:     
+                if char == "4":
+                    char = "Qu"
                 draw = ImageDraw.Draw(image)
                 draw.rectangle(((x-90, y-90), (x+90, y+90)), fill=(50,139,158))
                 draw = ImageDraw.Draw(image)
@@ -70,13 +78,9 @@ class BoggleGame():
         
     def hasword(self, word):
         word=word.upper()
+        word = word.replace("QU", "4") #fixed qu
         first = word[0]
         word = word[1:]
-        if (first == "Q"):
-            if (len(word) == 0) or (word[0] != "U"):
-                return False
-            first = "Qu"
-            word = word[1:]
         for i in range(4):
             for j in range(4):
                 if self.board[i][j] == first:
@@ -85,19 +89,14 @@ class BoggleGame():
         return False
                     
     def crawl(self, i, j, board, word):
-        if (i<0) or (i>3) or (j<0) or (j>3): #arranjar isto Qu
+        if (i<0) or (i>3) or (j<0) or (j>3): 
             return False
         if (len(word) == 0):
             return True    
         board[i][j] = "?"  
         first = word[0]
         first = first.upper()
-        word = word[1:]
-        if (first == "Q"):
-            if (len(word) == 0) or (word[0] != "U"):
-                return False
-            first = "Qu"
-            word = word[1:]        
+        word = word[1:]      
         for deltai in range(-1, 2):
             for deltaj in range(-1, 2):
                 try:
@@ -107,3 +106,41 @@ class BoggleGame():
                 except:
                     None
         return False
+    
+    def getall(self, tree):
+        words = []
+        for i in range(4):
+            for j in range(4):        
+                if tree.root.hasnext(self.board[i][j]):
+                    start = self.board[i][j]
+                    res = self.treecrawl(i, j, copy.deepcopy(self.board), tree.root.nodes[start])
+                    for piece in res:
+                        words += [start+piece]
+        finalwords = []
+        for word in words:
+            word = word.lower()
+            word = word.replace("4", "qu")
+            if (len(word) >= 3):
+                finalwords += [word]
+        finalwords.sort(key=len)
+        finalwords.reverse()
+        return finalwords
+                
+    def treecrawl(self, i, j, board, node):
+        if (i<0) or (i>3) or (j<0) or (j>3): 
+            return []
+        words = []
+        board[i][j] = "?"
+        for deltai in range(-1, 2):
+            for deltaj in range(-1, 2):        
+                try:
+                    if node.hasnext(board[i+deltai][j+deltaj]):
+                        start = board[i+deltai][j+deltaj]
+                        res = self.treecrawl(i+deltai, j+deltaj, copy.deepcopy(board), node.nodes[start])
+                        for piece in res:
+                            words += [start+piece]                    
+                except:
+                    None
+        if node.isword:
+            words += [""]
+        return words

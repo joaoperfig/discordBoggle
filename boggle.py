@@ -30,20 +30,20 @@ class MyClient(discord.Client):
         self.operations += [operations.SessionOperation()]
         self.operations += [operations.JoinOperation()]
         self.operations += [operations.GameOperation()]
-        
+
         self.operations += [operations.ExitOperation()]
         print(self.operations)
         self.state = "waiting"
         self.scores = {}
         self.words = {}
         self.mainchannel = None
-    
+
     async def on_ready(self):
         print('Logged on as {0}!'.format(self.user))
 
     async def on_message(self, message):
         print('Message from {0.author}: {0.content}'.format(message))
-        
+
         if message.author == client.user:
             return
         if (self.state == "gaming"):
@@ -65,7 +65,7 @@ class MyClient(discord.Client):
                         self.lastwordtime[player] = time.time()
                         if (thiswait > self.maxwaits[player]):
                             self.maxwaits[player] = thiswait
-                        
+
                         self.words[player] += [thisword]
                         print(player+" got word "+thisword)
         elif (self.state == "scoring"):
@@ -73,11 +73,11 @@ class MyClient(discord.Client):
         else:
             if not message.content.startswith("#"):
                 return
-            
+
             for operation in self.operations:
                 if(operation.check(message.content)):
                     await operation.run(message, message.content, self)
-  
+
 
 client = MyClient()
-client.run('your key here')
+client.run('INSERTKEYHERE')
